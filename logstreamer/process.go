@@ -9,7 +9,7 @@ import (
 
 type Server struct{}
 
-func (*Server) ProcessRequest(context context.Context, req *LogRequest) (*LogResponse, error) {
+func (*Server) ProcessRequest(context context.Context, req *logstreamer.LogRequest) (*LogResponse, error) {
 	fmt.Println("Got a new Add request")
 	mins := req.GetMinutes()
 	// profiles := req.GetProfiles()

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package logstreamer;
-option go_package="./logstreamer";
+option go_package=".;logstreamer";
 
 message LogRequest {
   int32 minutes = 1;
