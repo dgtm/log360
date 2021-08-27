@@ -3,11 +3,13 @@ package logstreamer
 import (
 	"context"
 	"fmt"
+
+	"github.com/dgtm/log360/logstreamer"
 )
 
-type server struct{}
+type Server struct{}
 
-func (*server) ProcessRequest(context context.Context, req *logstreamer.LogRequest) (*logstreamer.LogResponse, error) {
+func (*Server) ProcessRequest(context context.Context, req *LogRequest) (*LogResponse, error) {
 	fmt.Println("Got a new Add request")
 	mins := req.GetMinutes()
 	// profiles := req.GetProfiles()

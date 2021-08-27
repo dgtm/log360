@@ -8,6 +8,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+//protoc logstreamer.proto --go-grpc_out=../
+
 func main() {
 	lis, err := net.Listen("tcp", ":50551")
 	if err != nil {
