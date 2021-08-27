@@ -1,0 +1,16 @@
+syntax = "proto3";
+package logstreamer;
+option go_package="./logstreamerpb";
+
+message LogRequest {
+  int32 minutes = 1;
+  int32 profiles = 2;
+}
+
+message LogResponse {
+  int32 result = 1;
+}
+
+service LogStreamer {
+  rpc ProcessRequest(LogRequest) returns (LogResponse) {};
+}
