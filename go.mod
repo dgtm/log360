@@ -1,3 +1,3 @@
-module log360
+module github.com/dgtm/log360
 
 go 1.16
