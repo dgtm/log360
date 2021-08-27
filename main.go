@@ -15,10 +15,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to listen on port 50551: %v", err)
 	}
+
 	logServer := logstreamer.Server{}
 
 	s := grpc.NewServer()
-	logstreamer.RegisterLogStreamerServer(s, &logServer{})
+	log.Print(s.GetServiceInfo())
+	logstreamer.RegisterLogStreamerServer(s, &logServer)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Error while serving : %v", err)
 	}
