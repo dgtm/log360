@@ -1,0 +1,15 @@
+version: '3'
+services:
+  envoy:
+    image: envoyproxy/envoy-dev:a7b448c799d7b6fd915cef58d8a63d2bd22ded58
+    ports:
+      - "8080:8080"
+      - "9901:9901"
+    entrypoint: "/usr/local/bin/envoy"
+    command:
+      - "--config-path /etc/envoy/envoy.yaml"
+      - "--concurrency 1"
+      - "--mode serve"
+      - "--log-level debug"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
