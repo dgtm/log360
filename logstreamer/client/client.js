@@ -10,13 +10,25 @@ request.setMinutes(24);
 var stream = client.processRequest(request, {})
 
 stream.on('data', function(response) {
+    var fragment = new DocumentFragment()
+    
     results = response.getResultList()
+    var profile = response.getProfile()
+    document.getElementById( profile + '-count').innerHTML = results.length
     results.forEach(element => {
-        var li = document.createElement("li");
+        var div = document.createElement("div");
         var textnode = document.createTextNode(element)
-        li.appendChild(textnode)
-        document.getElementById(response.getProfile()).appendChild(div)
+        div.appendChild(textnode)
+        fragment.appendChild(div)
+        
     });
+    console.log(fragment)
+    document.getElementById(response.getProfile()).innerHTML = ""
+    document.getElementById(response.getProfile()).appendChild(fragment)
+    // container.innerHTML = '';
+    // container.appe(fragment);
+
+    // .replaceChild(fragment)
     console.log("Profile comes : ", response.getProfile());
 })
 

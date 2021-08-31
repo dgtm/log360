@@ -3,6 +3,7 @@ package fetcher
 import (
 	"context"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -131,12 +132,17 @@ func fetchResultsByRequest(client *cloudwatchlogs.Client, request *QueryRequest,
 		// log.Printf("%+v", resp)
 
 		for _, elem := range results {
+			var sb strings.Builder
+
 			for _, e := range elem {
-				log.Printf("%+v", e)
-				resultData = append(resultData, *e.Value)
-				// log.Printf("%+v", resultData)
-				// log.Print(*e.Value)
+				log.Printf("%+v", *e.Field)
+				sb.WriteString(*e.Field)
+				sb.WriteString(":")
+				sb.WriteString(*e.Value)
 			}
+			log.Print(sb.String())
+			resultData = append(resultData, sb.String())
+			sb.Reset()
 		}
 
 		result := &QueryResult{
@@ -145,7 +151,7 @@ func fetchResultsByRequest(client *cloudwatchlogs.Client, request *QueryRequest,
 		}
 		// log.Print(result)
 		partialResponseChan <- result
-		time.Sleep(8 * time.Second)
+		time.Sleep(20 * time.Second)
 
 		// if err != nil {
 		// 	log.Fatal(err)

@@ -12,11 +12,25 @@
             margin: auto;
             display: flex;
         }
-        .results .profile{
+        .profile{
             width: 50%;
             overflow: scroll;
             border: 2px solid;
             border-color: black;
+        }
+        .content div {
+            font-size: 16px;
+
+        }
+
+        .content div:nth-child(3n+1){
+        background: #FF7100;
+        }
+        .content div:nth-child(3n+2){
+        background: #FFB173;
+        }
+        .content div:nth-child(3n+3){
+        background: #A64A00;
         }
         .individual {
             overflow: hidden;
@@ -36,17 +50,18 @@
     </div>
 
     <div class="results">
+        <div class="profile">
+            <div id="trex-testing-count"></div>
 
-        <div id="trex-testing" class="profile">
-            <div id="trex-testing-count" class="profile">
-            </div>
-            <h2>Seizure</h2>
+            <div id="trex-testing" class="content">
+                <h2>Seizure</h2>
+            </div>    
         </div>
-        <div id="diba-testing" class="profile">
-            <div id="diba-testing-count" class="profile">
+        <div class="profile">
+            <div id="diba-testing-count"></div>
+            <div id="diba-testing" class="content">
+                <h2>DiBa</h2>
             </div>
-
-            <h2>DiBa</h2>
         </div>
     </div>
 </body>
