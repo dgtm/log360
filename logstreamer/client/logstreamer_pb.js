@@ -49,7 +49,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.logstreamer.LogResponse = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.logstreamer.LogResponse.repeatedFields_, null);
 };
 goog.inherits(proto.logstreamer.LogResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -220,6 +220,13 @@ proto.logstreamer.LogRequest.prototype.setProfiles = function(value) {
 
 
 
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.logstreamer.LogResponse.repeatedFields_ = [1];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -251,7 +258,8 @@ proto.logstreamer.LogResponse.prototype.toObject = function(opt_includeInstance)
  */
 proto.logstreamer.LogResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    result: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    resultList: (f = jspb.Message.getRepeatedField(msg, 1)) == null ? undefined : f,
+    profile: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -289,8 +297,12 @@ proto.logstreamer.LogResponse.deserializeBinaryFromReader = function(msg, reader
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setResult(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.addResult(value);
+      break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setProfile(value);
       break;
     default:
       reader.skipField();
@@ -321,10 +333,17 @@ proto.logstreamer.LogResponse.prototype.serializeBinary = function() {
  */
 proto.logstreamer.LogResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getResult();
-  if (f !== 0) {
-    writer.writeInt32(
+  f = message.getResultList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
       1,
+      f
+    );
+  }
+  f = message.getProfile();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
       f
     );
   }
@@ -332,20 +351,57 @@ proto.logstreamer.LogResponse.serializeBinaryToWriter = function(message, writer
 
 
 /**
- * optional int32 result = 1;
- * @return {number}
+ * repeated string result = 1;
+ * @return {!Array<string>}
  */
-proto.logstreamer.LogResponse.prototype.getResult = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.logstreamer.LogResponse.prototype.getResultList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 1));
 };
 
 
 /**
- * @param {number} value
+ * @param {!Array<string>} value
  * @return {!proto.logstreamer.LogResponse} returns this
  */
-proto.logstreamer.LogResponse.prototype.setResult = function(value) {
-  return jspb.Message.setProto3IntField(this, 1, value);
+proto.logstreamer.LogResponse.prototype.setResultList = function(value) {
+  return jspb.Message.setField(this, 1, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ * @return {!proto.logstreamer.LogResponse} returns this
+ */
+proto.logstreamer.LogResponse.prototype.addResult = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 1, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.logstreamer.LogResponse} returns this
+ */
+proto.logstreamer.LogResponse.prototype.clearResultList = function() {
+  return this.setResultList([]);
+};
+
+
+/**
+ * optional string profile = 2;
+ * @return {string}
+ */
+proto.logstreamer.LogResponse.prototype.getProfile = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.logstreamer.LogResponse} returns this
+ */
+proto.logstreamer.LogResponse.prototype.setProfile = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 

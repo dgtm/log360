@@ -78,7 +78,7 @@ proto.logstreamer.LogStreamerPromiseClient =
  */
 const methodDescriptor_LogStreamer_ProcessRequest = new grpc.web.MethodDescriptor(
   '/logstreamer.LogStreamer/ProcessRequest',
-  grpc.web.MethodType.UNARY,
+  grpc.web.MethodType.SERVER_STREAMING,
   proto.logstreamer.LogRequest,
   proto.logstreamer.LogResponse,
   /**
@@ -112,37 +112,32 @@ const methodInfo_LogStreamer_ProcessRequest = new grpc.web.AbstractClientBase.Me
 
 
 /**
- * @param {!proto.logstreamer.LogRequest} request The
- *     request proto
+ * @param {!proto.logstreamer.LogRequest} request The request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.logstreamer.LogResponse)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.logstreamer.LogResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.logstreamer.LogResponse>}
  *     The XHR Node Readable Stream
  */
 proto.logstreamer.LogStreamerClient.prototype.processRequest =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
       '/logstreamer.LogStreamer/ProcessRequest',
       request,
       metadata || {},
-      methodDescriptor_LogStreamer_ProcessRequest,
-      callback);
+      methodDescriptor_LogStreamer_ProcessRequest);
 };
 
 
 /**
- * @param {!proto.logstreamer.LogRequest} request The
- *     request proto
+ * @param {!proto.logstreamer.LogRequest} request The request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.logstreamer.LogResponse>}
- *     Promise that resolves to the response
+ * @return {!grpc.web.ClientReadableStream<!proto.logstreamer.LogResponse>}
+ *     The XHR Node Readable Stream
  */
 proto.logstreamer.LogStreamerPromiseClient.prototype.processRequest =
     function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
+  return this.client_.serverStreaming(this.hostname_ +
       '/logstreamer.LogStreamer/ProcessRequest',
       request,
       metadata || {},

@@ -8,9 +8,10 @@ message LogRequest {
 }
 
 message LogResponse {
-  int32 result = 1;
+  repeated string result = 1;
+  string profile = 2;
 }
 
 service LogStreamer {
-  rpc ProcessRequest(LogRequest) returns (LogResponse) {};
+  rpc ProcessRequest(LogRequest) returns (stream LogResponse) {};
 }

@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type LogStreamerClient interface {
-	ProcessRequest(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error)
+	ProcessRequest(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (LogStreamer_ProcessRequestClient, error)
 }
 
 type logStreamerClient struct {
@@ -29,20 +29,43 @@ func NewLogStreamerClient(cc grpc.ClientConnInterface) LogStreamerClient {
 	return &logStreamerClient{cc}
 }
 
-func (c *logStreamerClient) ProcessRequest(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (*LogResponse, error) {
-	out := new(LogResponse)
-	err := c.cc.Invoke(ctx, "/logstreamer.LogStreamer/ProcessRequest", in, out, opts...)
+func (c *logStreamerClient) ProcessRequest(ctx context.Context, in *LogRequest, opts ...grpc.CallOption) (LogStreamer_ProcessRequestClient, error) {
+	stream, err := c.cc.NewStream(ctx, &LogStreamer_ServiceDesc.Streams[0], "/logstreamer.LogStreamer/ProcessRequest", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &logStreamerProcessRequestClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type LogStreamer_ProcessRequestClient interface {
+	Recv() (*LogResponse, error)
+	grpc.ClientStream
+}
+
+type logStreamerProcessRequestClient struct {
+	grpc.ClientStream
+}
+
+func (x *logStreamerProcessRequestClient) Recv() (*LogResponse, error) {
+	m := new(LogResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // LogStreamerServer is the server API for LogStreamer service.
 // All implementations must embed UnimplementedLogStreamerServer
 // for forward compatibility
 type LogStreamerServer interface {
-	ProcessRequest(context.Context, *LogRequest) (*LogResponse, error)
+	ProcessRequest(*LogRequest, LogStreamer_ProcessRequestServer) error
 	mustEmbedUnimplementedLogStreamerServer()
 }
 
@@ -50,8 +73,8 @@ type LogStreamerServer interface {
 type UnimplementedLogStreamerServer struct {
 }
 
-func (UnimplementedLogStreamerServer) ProcessRequest(context.Context, *LogRequest) (*LogResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ProcessRequest not implemented")
+func (UnimplementedLogStreamerServer) ProcessRequest(*LogRequest, LogStreamer_ProcessRequestServer) error {
+	return status.Errorf(codes.Unimplemented, "method ProcessRequest not implemented")
 }
 func (UnimplementedLogStreamerServer) mustEmbedUnimplementedLogStreamerServer() {}
 
@@ -66,22 +89,25 @@ func RegisterLogStreamerServer(s grpc.ServiceRegistrar, srv LogStreamerServer) {
 	s.RegisterService(&LogStreamer_ServiceDesc, srv)
 }
 
-func _LogStreamer_ProcessRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LogRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _LogStreamer_ProcessRequest_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(LogRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(LogStreamerServer).ProcessRequest(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/logstreamer.LogStreamer/ProcessRequest",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LogStreamerServer).ProcessRequest(ctx, req.(*LogRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(LogStreamerServer).ProcessRequest(m, &logStreamerProcessRequestServer{stream})
+}
+
+type LogStreamer_ProcessRequestServer interface {
+	Send(*LogResponse) error
+	grpc.ServerStream
+}
+
+type logStreamerProcessRequestServer struct {
+	grpc.ServerStream
+}
+
+func (x *logStreamerProcessRequestServer) Send(m *LogResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // LogStreamer_ServiceDesc is the grpc.ServiceDesc for LogStreamer service.
@@ -90,12 +116,13 @@ func _LogStreamer_ProcessRequest_Handler(srv interface{}, ctx context.Context, d
 var LogStreamer_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "logstreamer.LogStreamer",
 	HandlerType: (*LogStreamerServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "ProcessRequest",
-			Handler:    _LogStreamer_ProcessRequest_Handler,
+			StreamName:    "ProcessRequest",
+			Handler:       _LogStreamer_ProcessRequest_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "logstreamer.proto",
 }

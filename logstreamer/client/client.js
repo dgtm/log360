@@ -5,15 +5,43 @@ console.log("where is server")
 var client = new LogStreamerClient('http://localhost:8080');
 
 var request = new LogRequest();
+request.setMinutes(24);
 
-request.setMinutes(2);
+var stream = client.processRequest(request, {})
 
-client.processRequest(request, {}, (err, response) => {
-    console.log(request)
-    console.log(err)
-
-    console.log("Result of minutes : ", response.getResult())
+stream.on('data', function(response) {
+    results = response.getResultList()
+    results.forEach(element => {
+        var li = document.createElement("li");
+        var textnode = document.createTextNode(element)
+        li.appendChild(textnode)
+        document.getElementById(response.getProfile()).appendChild(div)
+    });
+    console.log("Profile comes : ", response.getProfile());
 })
+
+  stream.on('status', function(status) {
+    // console.log(status.code);
+    // console.log(status.details);
+    // console.log(status.metadata);
+  });
+  stream.on('end', function(end) {
+    console.log("end")
+    console.log(end)
+
+    // stream end signal
+  });
+// , (err, response) => {
+//     console.log(request)
+//     console.log(err)
+
+//     console.log(response)
+//     console.log(response.toObject())
+
+//     console.log("Result of minutes : ", response.getResult())
+// })
+
+
 // var logService = new proto.logstreamer.LogStreamerClient('http://localhost:50551');
 
 // var request = new proto.logstreamer.LogRequest();

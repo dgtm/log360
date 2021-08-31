@@ -17,28 +17,31 @@ type QueryRequest struct {
 	CWQuery       string
 	AWSProfile    string
 	Limit         int32
+	Frame         int32
 }
 
 type QueryResult struct {
 	*QueryRequest
-	data *cloudwatchlogs.GetQueryResultsOutput
+	Data []string
 }
 
 // Body close???
 
-func main() {
+func Fetch(mins int32, partialResponseChan chan *QueryResult) {
 	inhouserequest := &QueryRequest{
 		AWSProfile:    "trex-testing",
 		LogGroupNames: []string{"/ecs/seizure", "/ecs/seizure-worker"},
-		CWQuery:       "fields @message",
+		CWQuery:       "fields @message | filter @message LIKE /Worker/ | stats count(*) as workerCount by bin(1m) | sort workerCount desc",
 		Limit:         10,
+		Frame:         mins,
 	}
 
 	crossRequest := &QueryRequest{
 		AWSProfile:    "diba-testing",
 		LogGroupNames: []string{"/ecs/digital-banking"},
-		CWQuery:       "fields @message",
+		CWQuery:       "fields @message | filter @message LIKE /Worker/ | stats count(*) as workerCount by bin(1m) | sort workerCount desc",
 		Limit:         10,
+		Frame:         mins,
 	}
 	requests := []*QueryRequest{crossRequest, inhouserequest}
 	result := []*QueryResult{}
@@ -47,23 +50,12 @@ func main() {
 	wg.Add(len(requests))
 
 	fullResponseChan := make(chan *QueryResult, len(requests))
-	partialResponseChan := make(chan *QueryResult)
 
 	for _, request := range requests {
 		go func(request *QueryRequest) {
 			fullResponseChan <- fetchLogByProfile(request, &wg, partialResponseChan)
 		}(request)
 	}
-
-	go func() {
-		for results := range partialResponseChan {
-			if results != nil {
-				log.Print("from partial")
-				log.Printf("%+v", results)
-			}
-
-		}
-	}()
 
 	wg.Wait()
 	close(fullResponseChan)
@@ -78,14 +70,15 @@ func main() {
 func makeRequest(client *cloudwatchlogs.Client, request *QueryRequest) {
 	endsAt := time.Now()
 	endTime := endsAt.Unix()
-	startTime := endsAt.Add(-time.Minute * 24).Unix()
+	// log.Print(time.Duration(request.Frame))
+	startTime := endsAt.Add(-time.Hour * 24000).Unix()
 
 	input := &cloudwatchlogs.StartQueryInput{
 		EndTime:       aws.Int64(endTime),
 		StartTime:     aws.Int64(startTime),
 		LogGroupNames: request.LogGroupNames,
 		QueryString:   aws.String(request.CWQuery),
-		Limit:         aws.Int32(request.Limit),
+		Limit:         aws.Int32(10000),
 	}
 	q, err := client.StartQuery(context.TODO(), input)
 
@@ -129,26 +122,30 @@ func fetchResultsByRequest(client *cloudwatchlogs.Client, request *QueryRequest,
 
 	status := resp.Status
 	for status == "Running" || status == "Scheduled" {
-		log.Print(resp.Status)
-		time.Sleep(2 * time.Second)
-		log.Print(*result_input.QueryId)
-
+		log.Printf("%s %s", request.AWSProfile, resp.Status)
+		// log.Print(*result_input.QueryId)
 		resp = getResponseStatus(client, result_input)
-		result := &QueryResult{
-			QueryRequest: request,
-			data:         resp,
-		}
-		partialResponseChan <- result
-		status = resp.Status
-		if status == "Complete" {
-			results := resp.Results
-			for _, elem := range results {
-				for _, e := range elem {
-					log.Print(*e.Value)
-					// log.Print(*e.Value)
-				}
+
+		resultData := []string{}
+		results := resp.Results
+		// log.Printf("%+v", resp)
+
+		for _, elem := range results {
+			for _, e := range elem {
+				log.Printf("%+v", e)
+				resultData = append(resultData, *e.Value)
+				// log.Printf("%+v", resultData)
+				// log.Print(*e.Value)
 			}
 		}
+
+		result := &QueryResult{
+			QueryRequest: request,
+			Data:         resultData,
+		}
+		// log.Print(result)
+		partialResponseChan <- result
+		time.Sleep(8 * time.Second)
 
 		// if err != nil {
 		// 	log.Fatal(err)
@@ -160,9 +157,9 @@ func fetchResultsByRequest(client *cloudwatchlogs.Client, request *QueryRequest,
 	}
 	result := &QueryResult{
 		QueryRequest: request,
-		data:         resp,
+		Data:         []string{"asdasd"},
 	}
-	log.Print(result)
+	// log.Print(result)
 
 	return result
 }
