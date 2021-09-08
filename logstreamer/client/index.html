@@ -8,59 +8,87 @@
     <script src='./dist/main.js'></script>
 
     <style>
+        body {
+            font-family: monospace;
+        }
         .results {
             margin: auto;
             display: flex;
+            height: 100vh;
+        }
+        input {
+            height: 2em;
+            width: 5%;
+        }
+        button {
+            height: 3em;
+            background-color: bisque;
+            border-radius: 0.5em;
         }
         .profile{
+            padding: 0.5em;
             width: 50%;
-            overflow: scroll;
             border: 2px solid;
-            border-color: black;
+            border-color: ghostwhite;
+            background-color: steelblue;
+            border-radius: 1em;
         }
         .content div {
             font-size: 16px;
 
         }
+        .content {
+            overflow: scroll;
+        }
+        .counter {
+            margin: 0 auto;
+            width: 50%;
+
+            font-size: 30px;
+            color: white;
+            text-align: center;
+            height: 2em;
+        }
 
         .content div:nth-child(3n+1){
-        background: #FF7100;
+            background: wheat;
         }
         .content div:nth-child(3n+2){
-        background: #FFB173;
+            background: lightgray;
         }
         .content div:nth-child(3n+3){
-        background: #A64A00;
+            background: azure;
         }
-        .individual {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: block;
-            width: 100%;
-            min-width: 1px;
+        .inputs{
+            text-align: right;
+            background-color: darkseagreen;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+            text-align: center;
+            border-radius: 1em;
+
+            /* font-size: x-large; */
         }
     </style>
 </head>
 <body>
     
     <div class="inputs">
-        <input type="text" value="10 minutes">
-        <button>Search</button>
+        Relative time in hours
+        <input type="number" value="24" placeholder="24">
+        <button>Go!</button>
     </div>
 
     <div class="results">
         <div class="profile">
-            <div id="trex-testing-count"></div>
+            <div id="trex-testing-count" class="counter">0 records</div>
 
             <div id="trex-testing" class="content">
-                <h2>Seizure</h2>
             </div>    
         </div>
         <div class="profile">
-            <div id="diba-testing-count"></div>
+            <div id="diba-testing-count" class="counter">0 records</div>
             <div id="diba-testing" class="content">
-                <h2>DiBa</h2>
             </div>
         </div>
     </div>
